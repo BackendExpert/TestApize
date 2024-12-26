@@ -2,7 +2,7 @@ import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import WelcomPage from './pages/WelcomPage';
 import Start from './pages/Start';
 import DashBoard from './pages/DashBoard';
-import HomeDash from './components/HomeDash';
+import HomeDash from './pages/HomeDash';
 import Settings from './pages/Settings';
 
 function App() {
