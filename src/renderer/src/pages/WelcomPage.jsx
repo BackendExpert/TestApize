@@ -14,7 +14,7 @@ const WelcomPage = () => {
             <h1 className="pt-16">API development and testing platform</h1>
 
             <div className="">
-                <Link to={'/Start'}>
+                <Link to={'/Dashboard/Home'}>
                     <button className="bg-blue-500 text-white py-2 px-8 rounded my-8">Get Started</button>                
                 </Link>                
             </div>
