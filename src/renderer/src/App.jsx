@@ -6,6 +6,7 @@ import HomeDash from './pages/HomeDash';
 import Settings from './pages/Settings';
 import Collection from './pages/Collection';
 import CollectionForm from './components/CollectionForm';
+import CollectionSelected from './pages/CollectionSelected';
 
 function App() {
   const ipcHandle = () => window.Electron.ipcRenderer.send('ping')
@@ -20,6 +21,7 @@ function App() {
           <Route path='Settings' element={<Settings /> } />
           <Route path='Collection' element={<Collection /> } />
           <Route path='CreateCollection' element={<CollectionForm /> } />
+          <Route path='CollectionSelected/:name' element={<CollectionSelected /> } />
         </Route>
       </Routes>
     </Router>

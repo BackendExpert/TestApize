@@ -1,33 +1,38 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
-import path from 'path'
-import fs from 'fs'
+import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import { join } from 'path';
+import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import icon from '../../resources/icon.png?asset';
+import fs from 'fs';
+import path from 'path';
 
 // File path for saving collections data
-const filePath = path.join('C:/TestAPIze', 'collection.json')
+const filePath = path.join('C:/TestAPIze', 'collection.json');
 
 // Ensure directory exists
 function ensureDirectoryExistence(filePath) {
-  const dir = path.dirname(filePath)
+  const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true })
+    fs.mkdirSync(dir, { recursive: true });
   }
 }
 
 // Save collections to file
 function saveToFile(data) {
-  ensureDirectoryExistence(filePath)
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8')
+  ensureDirectoryExistence(filePath);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
 // Load collections from file
 function loadFromFile() {
   if (fs.existsSync(filePath)) {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+    try {
+      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (error) {
+      console.error('Error reading collections file:', error);
+      return []; // Return empty array if parsing fails
+    }
   }
-  return {} // Return empty object if file doesn't exist
+  return []; // Return empty array if file doesn't exist
 }
 
 function createWindow() {
@@ -40,34 +45,61 @@ function createWindow() {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
-  })
+      preload: join(__dirname, '../preload/index.js'), // Ensure this points to the correct preload file
+      sandbox: false,
+    },
+  });
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+    mainWindow.show();
+  });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+    shell.openExternal(details.url);
+    return { action: 'deny' };
+  });
 
+  // IPC for handling save, load, and add operations for collections
   ipcMain.handle('save-collections', (_, data) => {
-    saveToFile(data)
-  })
-  
-  ipcMain.handle('load-collections', () => {
-    return loadFromFile()
-  })
+    try {
+      saveToFile(data); // Save collection data
+      return { success: true };
+    } catch (error) {
+      console.error('Error saving collections:', error);
+      return { success: false, message: 'Failed to save collections' };
+    }
+  });
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
+  ipcMain.handle('load-collections', () => {
+    try {
+      return { success: true, collections: loadFromFile() };
+    } catch (error) {
+      console.error('Error loading collections:', error);
+      return { success: false, message: 'Failed to load collections' };
+    }
+  });
+
+  ipcMain.handle('add-api-to-collection', async (event, apiData) => {
+    try {
+      const collections = loadFromFile();
+
+      collections.push(apiData); // Add new API data to the collection array
+
+      saveToFile(collections); // Save the updated collections
+
+      return { success: true, collection: collections };
+    } catch (error) {
+      console.error('Error adding API to collection:', error);
+      return { success: false, message: 'Failed to add API to collection' };
+    }
+  });
+
+  // HMR for renderer based on electron-vite CLI.
+  // Load the remote URL for development or the local HTML file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
   }
 }
 
@@ -75,36 +107,27 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  // Set app user model ID for Windows
+  electronApp.setAppUserModelId('com.electron');
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
+  // See https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+    optimizer.watchWindowShortcuts(window);
+  });
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
-  createWindow()
+  createWindow();
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+    // On macOS, it's common to re-create a window when the dock icon is clicked
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Quit when all windows are closed, except on macOS.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+});

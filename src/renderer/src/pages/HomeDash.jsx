@@ -32,9 +32,10 @@ const HomeDash = () => {
               <div className="bg-gray-400/20 rounded shadow-md p-4">
                   <h1 className="text-center text-gray-500">Collections</h1>
                   <img src={Collection} alt="" className='rounded-md mt-4'/>
-              </div>
-             
+              </div>             
           </div>
+          <h1 className='text-red-500 uppercase font-semibold'>Important</h1>
+          <div className="text-gray-500">Still works on fetching data option (v2.0.0-beta1)</div>
         </div>
     </div>
   )
