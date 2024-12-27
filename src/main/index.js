@@ -2,6 +2,33 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import path from 'path'
+import fs from 'fs'
+
+// File path for saving collections data
+const filePath = path.join('C:/TestAPIze', 'collection.json')
+
+// Ensure directory exists
+function ensureDirectoryExistence(filePath) {
+  const dir = path.dirname(filePath)
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
+  }
+}
+
+// Save collections to file
+function saveToFile(data) {
+  ensureDirectoryExistence(filePath)
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8')
+}
+
+// Load collections from file
+function loadFromFile() {
+  if (fs.existsSync(filePath)) {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  }
+  return {} // Return empty object if file doesn't exist
+}
 
 function createWindow() {
   // Create the browser window.
@@ -25,6 +52,14 @@ function createWindow() {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+
+  ipcMain.handle('save-collections', (_, data) => {
+    saveToFile(data)
+  })
+  
+  ipcMain.handle('load-collections', () => {
+    return loadFromFile()
   })
 
   // HMR for renderer base on electron-vite cli.
