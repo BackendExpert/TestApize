@@ -1,15 +1,17 @@
 import React from 'react'
 import { CiLink } from "react-icons/ci";
-import { MdOutlineAddBox } from "react-icons/md";
 import { AiFillDashboard } from "react-icons/ai";
 import { Link } from 'react-router-dom';
 import { FaGear } from "react-icons/fa6";
+import { MdCollectionsBookmark } from "react-icons/md";
+import { FaPowerOff } from "react-icons/fa";
 
 const SideBar = () => {
     const sidemune = [
         {id: 1, name: 'Dashboard', icon: <AiFillDashboard className='h-6 w-auto text-gray-500'/>, link: 'Home'},
-        {id: 2, name: 'Create Collection', icon: <MdOutlineAddBox className='h-6 w-auto text-gray-500'/>, link: ''},  
-        {id: 3, name: 'Settings', icon: <FaGear className='h-6 w-auto text-gray-500'/>, link: 'Settings'},      
+        {id: 2, name: 'My Collections', icon: <MdCollectionsBookmark className='h-6 w-auto text-gray-500'/>, link: 'Collection'},  
+        {id: 3, name: 'Settings', icon: <FaGear className='h-6 w-auto text-gray-500'/>, link: 'Settings'},  
+        {id: 4, name: 'Logout', icon: <FaPowerOff className='h-6 w-auto text-gray-500'/>, link: '/'},    
     ]
   return (
     <div className=''>
@@ -35,7 +37,7 @@ const SideBar = () => {
         </div>
         <hr />
         <div className="p-4">
-            <h1 className="text-gray-500">My Collections</h1>
+            <h1 className="text-gray-500">Recent Collections</h1>
         </div>
 
 

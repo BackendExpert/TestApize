@@ -4,6 +4,7 @@ import Start from './pages/Start';
 import DashBoard from './pages/DashBoard';
 import HomeDash from './pages/HomeDash';
 import Settings from './pages/Settings';
+import Collection from './pages/Collection';
 
 function App() {
   const ipcHandle = () => window.Electron.ipcRenderer.send('ping')
@@ -16,6 +17,7 @@ function App() {
         <Route path='/Dashboard' element={<DashBoard /> }>
           <Route path='Home' element={<HomeDash /> } />
           <Route path='Settings' element={<Settings /> } />
+          <Route path='Collection' element={<Collection /> } />
         </Route>
       </Routes>
     </Router>
