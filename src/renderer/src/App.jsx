@@ -5,6 +5,7 @@ import DashBoard from './pages/DashBoard';
 import HomeDash from './pages/HomeDash';
 import Settings from './pages/Settings';
 import Collection from './pages/Collection';
+import CollectionForm from './components/CollectionForm';
 
 function App() {
   const ipcHandle = () => window.Electron.ipcRenderer.send('ping')
@@ -18,6 +19,7 @@ function App() {
           <Route path='Home' element={<HomeDash /> } />
           <Route path='Settings' element={<Settings /> } />
           <Route path='Collection' element={<Collection /> } />
+          <Route path='CreateCollection' element={<CollectionForm /> } />
         </Route>
       </Routes>
     </Router>
